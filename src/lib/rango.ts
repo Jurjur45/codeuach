@@ -13,6 +13,34 @@ export function rango(rating: number): Rango {
   return { nombre: "maestro", clase: "r6" };
 }
 
+/** Los rangos en orden, con el rating desde el que se alcanzan. */
+export const CORTES = [
+  { desde: 0, nombre: "novato" },
+  { desde: 1000, nombre: "aprendiz" },
+  { desde: 1400, nombre: "competente" },
+  { desde: 1700, nombre: "avanzado" },
+  { desde: 2000, nombre: "experto" },
+  { desde: 2400, nombre: "maestro" },
+];
+
+/** El rango que viene, cuánto falta y qué fracción del tramo actual va hecha.
+ *  Nulo cuando ya se está en el rango más alto. */
+export function siguienteRango(rating: number) {
+  const i = CORTES.findIndex((c) => c.desde > rating);
+  if (i === -1) return null;
+  const actual = CORTES[i - 1];
+  const sig = CORTES[i];
+  return {
+    nombre: sig.nombre,
+    clase: rango(sig.desde).clase,
+    faltan: sig.desde - rating,
+    progreso: (rating - actual.desde) / (sig.desde - actual.desde),
+  };
+}
+
+/** La insignia de un rango, recortada de public/rangos.jpg. */
+export const insignia = (nombre: string) => `/rangos/${nombre}.jpg`;
+
 /** Etiqueta corta de veredicto, la que cabe en una insignia de tabla. */
 export const veredictoCorto = {
   ac: "OK",

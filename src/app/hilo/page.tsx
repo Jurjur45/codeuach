@@ -1,11 +1,10 @@
-import Bloque from "@/components/layout/Bloque";
+import Link from "next/link";
+import Bloque, { CuerpoBloque } from "@/components/layout/Bloque";
 import Pagina from "@/components/layout/Pagina";
-import CajaRespuesta from "@/components/hilo/CajaRespuesta";
-import Mensaje from "@/components/hilo/Mensaje";
+import EnvioAdjunto from "@/components/hilo/EnvioAdjunto";
 import ProblemasDelSet from "@/components/lateral/ProblemasDelSet";
-import ReglasDelHilo from "@/components/lateral/ReglasDelHilo";
 import TuEstado from "@/components/lateral/TuEstado";
-import Paginacion from "@/components/ui/Paginacion";
+import Insignia from "@/components/ui/Insignia";
 import Vacio from "@/components/ui/Vacio";
 import {
   obtenerEstadoEnProblema,
@@ -14,6 +13,8 @@ import {
 } from "@/lib/datos";
 import type { Miga } from "@/components/layout/Migas";
 
+// El chat del hilo (respuestas, citas y caja de respuesta) queda fuera por
+// ahora: la página muestra sólo el enunciado y el último envío del usuario.
 export default async function HiloPage() {
   const [hilo, estado, set] = await Promise.all([
     obtenerHilo(),
@@ -29,6 +30,9 @@ export default async function HiloPage() {
       ]
     : [{ texto: "Índice", href: "/" }, { texto: "Problema" }];
 
+  const enunciado = hilo?.mensajes.find((m) => m.fijado);
+  const envio = hilo?.mensajes.find((m) => m.envio)?.envio;
+
   return (
     <Pagina
       activo="Problemas"
@@ -37,29 +41,29 @@ export default async function HiloPage() {
         <>
           <TuEstado estado={estado} />
           <ProblemasDelSet set={set} />
-          <ReglasDelHilo />
         </>
       }
     >
-      <Bloque titulo={hilo ? hilo.titulo : "Problema"} nota={hilo?.limites}>
-        {!hilo || hilo.mensajes.length === 0 ? (
-          <Vacio>
-            Este hilo todavía no tiene mensajes. El enunciado aparece aquí en cuanto el
-            docente lo publica.
-          </Vacio>
+      <Bloque
+        titulo={hilo ? hilo.titulo : "Problema"}
+        nota={hilo?.limites}
+        accion={<Link href="/envios">Enviar solución</Link>}
+      >
+        {enunciado ? (
+          <CuerpoBloque>
+            <p className="enunciado">{enunciado.cuerpo}</p>
+          </CuerpoBloque>
         ) : (
-          hilo.mensajes.map((m) => <Mensaje key={m.id} mensaje={m} />)
+          <Vacio>El enunciado aparece aquí en cuanto el docente lo publica.</Vacio>
         )}
       </Bloque>
 
-      <CajaRespuesta />
-
-      {hilo && (
-        <Paginacion
-          pagina={hilo.pagina}
-          totalPaginas={hilo.totalPaginas}
-          totalMensajes={hilo.totalMensajes}
-        />
+      {envio && (
+        <Bloque titulo="Tu último envío" apagado accion={<Insignia veredicto={envio.veredicto} />}>
+          <CuerpoBloque>
+            <EnvioAdjunto envio={envio} />
+          </CuerpoBloque>
+        </Bloque>
       )}
     </Pagina>
   );

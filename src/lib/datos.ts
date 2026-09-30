@@ -14,14 +14,17 @@ import type {
   Categoria,
   Estadisticas,
   EstadoEnProblema,
+  EnvioFila,
   Hilo,
+  PerfilUsuario,
   ProblemaDelSet,
+  ResumenVeredictos,
   TopUsuario,
   UsuarioEnLinea,
 } from "./tipos";
 
 /**
- * Las tres secciones de la portada. Los títulos son estructura del producto y
+ * Las secciones de la portada. Los títulos son estructura del producto y
  * se quedan; las filas salen de la base.
  *
  * TODO: `Ramo` filtrado por semestre vigente, con el conteo de
@@ -30,72 +33,39 @@ import type {
 export async function obtenerCategorias(): Promise<Categoria[]> {
   return [
     {
-      id: "ramos",
-      titulo: "Ramos en curso",
-      vacio: "Todavía no hay ramos publicados para este semestre.",
-      filas: [
-        {
-          slug: "info082",
-          titulo: "INFO082 · Programación",
-          desc: "Primer curso de programación. Problemas semanales de implementación y strings.",
-          etiquetas: ["C++", "Python"],
-          problemas: 12,
-          envios: 1843,
-          ultimo: { que: "Cuenta de vocales", quien: "matias2005-20", rating: 1750, cuando: "hace 5 min" },
-          icono: "nuevo",
-        },
-        {
-          slug: "info165",
-          titulo: "INFO165 · Estructuras de Datos",
-          desc: "Pilas, colas, árboles y heaps. Evaluaciones con juez automático.",
-          etiquetas: ["C++"],
-          problemas: 9,
-          envios: 1027,
-          ultimo: { que: "Mediana en línea", quien: "Lasc19", rating: 2100, cuando: "hace 32 min" },
-          icono: "normal",
-        },
-        {
-          slug: "info183",
-          titulo: "INFO183 · Algoritmos",
-          desc: "Grafos, programación dinámica y búsqueda. Set de la unidad 2 abierto.",
-          etiquetas: ["C++", "Java"],
-          problemas: 6,
-          envios: 512,
-          ultimo: { que: "Rutas del campus Isla Teja", quien: "facs2005", rating: 1520, cuando: "hace 2 h" },
-          icono: "listo",
-        },
-      ],
-    },
-    {
       id: "practica",
       titulo: "Práctica libre",
       nota: "Abierto a toda la universidad",
       vacio: "Todavía no hay problemas liberados a práctica libre.",
       filas: [
         {
-          slug: "practica-basica",
+          slug: "iniciacion",
           titulo: "Problemas de iniciación",
           desc: "Para quien recién empieza: entrada, salida y ciclos.",
           etiquetas: ["principiante"],
           problemas: 20,
           envios: 3210,
-          ultimo: { que: "Suma de dos números", quien: "jurjur45", rating: 980, cuando: "hace 12 min" },
-          icono: "normal",
+          ultimo: { que: "Suma de dos números", quien: "jurjur45", rating: 2650, cuando: "hace 12 min" },
+          icono: "nuevo",
         },
-      ],
-    },
-    {
-      id: "comunidad",
-      titulo: "Comunidad",
-      vacio: "Todavía no hay secciones de comunidad abiertas.",
-      filas: [
         {
-          slug: "maraton",
-          titulo: "Preparación para la maratón",
-          desc: "Entrenamiento para la competencia de programación ICPC.",
-          problemas: 15,
-          envios: 764,
-          ultimo: { que: "Marea del río Calle-Calle", quien: "Lasc19", rating: 2100, cuando: "ayer" },
+          slug: "strings",
+          titulo: "Strings y arreglos",
+          desc: "Recorridos, conteos y manipulación de texto.",
+          etiquetas: ["strings", "arreglos"],
+          problemas: 14,
+          envios: 1845,
+          ultimo: { que: "Cuenta de vocales", quien: "matias2005-20", rating: 100, cuando: "hace 40 min" },
+          icono: "listo",
+        },
+        {
+          slug: "algoritmos",
+          titulo: "Grafos y programación dinámica",
+          desc: "Problemas de nivel intermedio y avanzado para entrenar.",
+          etiquetas: ["grafos", "dp"],
+          problemas: 11,
+          envios: 902,
+          ultimo: { que: "Rutas del campus Isla Teja", quien: "Lasc19", rating: 100, cuando: "hace 3 h" },
           icono: "normal",
         },
       ],
@@ -103,23 +73,47 @@ export async function obtenerCategorias(): Promise<Categoria[]> {
   ];
 }
 
-/** TODO: `Usuario` ordenado por rating, con el delta desde `CambioRating`. */
+/** TODO: el usuario de la sesión, con sus conteos y su puesto en el ranking. */
+export async function obtenerPerfil(): Promise<PerfilUsuario> {
+  return {
+    handle: "jurjur45",
+    carrera: "Hacker",
+    rating: 2650,
+    puesto: 1,
+    totalUsuarios: 248,
+    resueltos: 187,
+    intentados: 6,
+    envios: 412,
+    aceptacion: 78,
+    racha: 36,
+    ultimosResueltos: [
+      { nombre: "Cuenta de vocales", ramo: "INFO082", cuando: "ayer" },
+      { nombre: "Suma de dos números", ramo: "INFO082", cuando: "hace 3 días" },
+      { nombre: "Pila balanceada", ramo: "INFO165", cuando: "hace 5 días" },
+    ],
+    deltaSemana: 45,
+    historial: [2380, 2425, 2410, 2490, 2545, 2605, 2650],
+    rival: { handle: "Lasc19", rating: 100, puesto: 2 },
+  };
+}
+
+/** TODO: `Usuario` ordenado por rating (y resueltos, para desempatar), con el delta desde `CambioRating`. */
 export async function obtenerTopRating(): Promise<TopUsuario[]> {
   return [
-    { puesto: 1, usuario: "Lasc19", carrera: "Ing. Civil Informática", rating: 2100, delta: 35 },
-    { puesto: 2, usuario: "matias2005-20", carrera: "Ing. Civil Informática", rating: 1750, delta: 12 },
-    { puesto: 3, usuario: "facs2005", carrera: "Ing. Civil Electrónica", rating: 1520, delta: -8 },
-    { puesto: 4, usuario: "SoulFast23", carrera: "Ing. Civil Informática", rating: 1240, delta: 20 },
-    { puesto: 5, usuario: "jurjur45", carrera: "Bioinformática", rating: 980, delta: 0, yo: true },
+    { puesto: 1, usuario: "jurjur45", carrera: "Hacker", rating: 2650, resueltos: 187, delta: 45, yo: true },
+    { puesto: 2, usuario: "Lasc19", carrera: "Ing. Civil Informática", rating: 100, resueltos: 3, delta: 0 },
+    { puesto: 3, usuario: "matias2005-20", carrera: "Ing. Civil Informática", rating: 100, resueltos: 3, delta: 0 },
+    { puesto: 4, usuario: "facs2005", carrera: "Ing. Civil Electrónica", rating: 100, resueltos: 2, delta: 0 },
+    { puesto: 5, usuario: "SoulFast23", carrera: "Ing. Civil Informática", rating: 100, resueltos: 2, delta: 0 },
   ];
 }
 
 /** TODO: sesiones con actividad en los últimos 15 minutos. */
 export async function obtenerEnLinea(): Promise<UsuarioEnLinea[]> {
   return [
-    { usuario: "Lasc19", rating: 2100 },
-    { usuario: "matias2005-20", rating: 1750 },
-    { usuario: "jurjur45", rating: 980 },
+    { usuario: "Lasc19", rating: 100 },
+    { usuario: "matias2005-20", rating: 100 },
+    { usuario: "jurjur45", rating: 2650 },
   ];
 }
 
@@ -138,7 +132,7 @@ export async function obtenerEstadisticas(): Promise<Estadisticas> {
 export async function obtenerAviso(): Promise<Aviso | null> {
   return {
     id: "aviso-1",
-    cuerpo: "El set de la unidad 2 de INFO183 cierra el viernes a las 23:59.",
+    cuerpo: "Esta semana se liberaron 3 problemas nuevos en práctica libre.",
   };
 }
 
@@ -152,7 +146,7 @@ const docente: Autor = {
 
 const alumno: Autor = {
   handle: "jurjur45",
-  rating: 980,
+  rating: 2650,
   rol: "Estudiante",
   mensajes: 14,
   desde: "mar 2026",
@@ -163,7 +157,7 @@ export async function obtenerHilo(): Promise<Hilo | null> {
   return {
     titulo: "B · Cuenta de vocales",
     limites: "1 s · 256 MB",
-    ramo: { codigo: "INFO082", nombre: "Programación" },
+    ramo: { codigo: "Práctica libre", nombre: "Strings y arreglos" },
     mensajes: [
       {
         id: "m1",
@@ -194,16 +188,8 @@ export async function obtenerHilo(): Promise<Hilo | null> {
           resumen: "4 de 4 casos correctos · 24 ms máximo",
         },
       },
-      {
-        id: "m3",
-        numero: 3,
-        autor: docente,
-        cuando: "28 sep 2026, 19:05",
-        cita: { de: "jurjur45", texto: "Mi solución recorre la palabra una sola vez, así que es O(n)." },
-        cuerpo: "Correcto. Buena solución, es justo lo que se esperaba.",
-      },
     ],
-    totalMensajes: 3,
+    totalMensajes: 2,
     pagina: 1,
     totalPaginas: 1,
   };
@@ -223,4 +209,27 @@ export async function obtenerProblemasDelSet(): Promise<ProblemaDelSet[]> {
     { letra: "D", nombre: "Rutas del campus Isla Teja", veredicto: "tle" },
     { letra: "E", nombre: "Mediana en línea", veredicto: null },
   ];
+}
+
+/** TODO: `Envio` más recientes, paginados, con usuario y problema. */
+export async function obtenerEnvios(): Promise<EnvioFila[]> {
+  return [
+    { id: 10482, cuando: "hace 2 min", usuario: "jurjur45", rating: 2650, problema: "E · Mediana en línea", lenguaje: "C++17", veredicto: "ac", tiempoMs: 46, memoriaKb: 3412 },
+    { id: 10481, cuando: "hace 4 min", usuario: "matias2005-20", rating: 100, problema: "C · Mochila del estudiante", lenguaje: "Python 3", veredicto: "tle", caso: 7, tiempoMs: 1000, memoriaKb: 14820 },
+    { id: 10480, cuando: "hace 6 min", usuario: "jurjur45", rating: 2650, problema: "E · Mediana en línea", lenguaje: "C++17", veredicto: "wa", caso: 12, tiempoMs: 41, memoriaKb: 3400 },
+    { id: 10479, cuando: "hace 9 min", usuario: "Lasc19", rating: 100, problema: "D · Rutas del campus Isla Teja", lenguaje: "C++17", veredicto: "ac", tiempoMs: 124, memoriaKb: 8920 },
+    { id: 10478, cuando: "hace 11 min", usuario: "SoulFast23", rating: 100, problema: "B · Cuenta de vocales", lenguaje: "Java 21", veredicto: "ce", tiempoMs: 0, memoriaKb: 0 },
+    { id: 10477, cuando: "hace 15 min", usuario: "facs2005", rating: 100, problema: "C · Mochila del estudiante", lenguaje: "C++17", veredicto: "ac", tiempoMs: 78, memoriaKb: 40216 },
+    { id: 10476, cuando: "hace 18 min", usuario: "jurjur45", rating: 2650, problema: "D · Rutas del campus Isla Teja", lenguaje: "C++17", veredicto: "ac", tiempoMs: 93, memoriaKb: 7844 },
+    { id: 10475, cuando: "hace 22 min", usuario: "matias2005-20", rating: 100, problema: "C · Mochila del estudiante", lenguaje: "Python 3", veredicto: "re", caso: 3, tiempoMs: 62, memoriaKb: 9120 },
+    { id: 10474, cuando: "hace 30 min", usuario: "SoulFast23", rating: 100, problema: "A · Suma de dos números", lenguaje: "Java 21", veredicto: "ac", tiempoMs: 108, memoriaKb: 21504 },
+    { id: 10473, cuando: "hace 41 min", usuario: "Lasc19", rating: 100, problema: "E · Mediana en línea", lenguaje: "C++17", veredicto: "mle", caso: 18, tiempoMs: 310, memoriaKb: 262144 },
+    { id: 10472, cuando: "hace 55 min", usuario: "jurjur45", rating: 2650, problema: "C · Mochila del estudiante", lenguaje: "C++17", veredicto: "ac", tiempoMs: 31, memoriaKb: 4096 },
+    { id: 10471, cuando: "hace 1 h", usuario: "facs2005", rating: 100, problema: "B · Cuenta de vocales", lenguaje: "C", veredicto: "ac", tiempoMs: 15, memoriaKb: 1024 },
+  ];
+}
+
+/** TODO: conteo de los envíos del usuario agrupados por veredicto. */
+export async function obtenerResumenVeredictos(): Promise<ResumenVeredictos> {
+  return { ac: 321, wa: 54, tle: 21, mle: 4, ce: 5, re: 7 };
 }

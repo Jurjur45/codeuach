@@ -240,3 +240,10 @@ pre.code {
   margin: 0;
   font-size: 13px;
 }
+
+/* El enunciado, sin el chat alrededor. */
+.enunciado {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+}

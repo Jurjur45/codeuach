@@ -47,6 +47,7 @@ export type TopUsuario = {
   usuario: string;
   carrera: string;
   rating: number;
+  resueltos: number;
   /** Cambio de rating de la última semana. */
   delta: number;
   yo?: boolean;
@@ -126,3 +127,45 @@ export type ProblemaDelSet = {
   nombre: string;
   veredicto: Veredicto | null;
 };
+
+/** El usuario con la sesión abierta y su resumen, para la portada. */
+export type PerfilUsuario = {
+  handle: string;
+  carrera: string;
+  rating: number;
+  /** Puesto en el ranking general y de cuántos. */
+  puesto: number;
+  totalUsuarios: number;
+  resueltos: number;
+  intentados: number;
+  envios: number;
+  /** Porcentaje de envíos aceptados. */
+  aceptacion: number;
+  /** Días seguidos con al menos un envío. */
+  racha: number;
+  ultimosResueltos: { nombre: string; ramo: string; cuando: string }[];
+  /** Cambio de rating en los últimos 7 días. */
+  deltaSemana: number;
+  /** Rating al cierre de cada una de las últimas semanas, de la más antigua a hoy. */
+  historial: number[];
+  /** Quien está justo arriba en el ranking (o, si se es el #1, quien viene detrás). */
+  rival: { handle: string; rating: number; puesto: number } | null;
+};
+
+/** Una fila de la tabla de envíos, al estilo de la página de estado de Codeforces. */
+export type EnvioFila = {
+  id: number;
+  cuando: string;
+  usuario: string;
+  rating: number;
+  problema: string;
+  lenguaje: string;
+  veredicto: Veredicto;
+  /** El caso en que falló; se omite si fue aceptado o no compiló. */
+  caso?: number;
+  tiempoMs: number;
+  memoriaKb: number;
+};
+
+/** Conteo de los envíos del usuario por veredicto. */
+export type ResumenVeredictos = Record<Veredicto, number>;

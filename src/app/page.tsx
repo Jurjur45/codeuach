@@ -1,24 +1,23 @@
 import Pagina from "@/components/layout/Pagina";
 import Leyenda from "@/components/indice/Leyenda";
+import PanelUsuario from "@/components/indice/PanelUsuario";
+import RankingGlobal from "@/components/indice/RankingGlobal";
 import SeccionRamos from "@/components/indice/SeccionRamos";
-import CajaSesion from "@/components/lateral/CajaSesion";
-import Conectados from "@/components/lateral/Conectados";
 import Estadisticas from "@/components/lateral/Estadisticas";
 import PanelAviso from "@/components/lateral/PanelAviso";
-import TopRating from "@/components/lateral/TopRating";
 import {
   obtenerAviso,
   obtenerCategorias,
-  obtenerEnLinea,
   obtenerEstadisticas,
+  obtenerPerfil,
   obtenerTopRating,
 } from "@/lib/datos";
 
 export default async function Indice() {
-  const [categorias, top, enLinea, stats, aviso] = await Promise.all([
+  const [perfil, categorias, top, stats, aviso] = await Promise.all([
+    obtenerPerfil(),
     obtenerCategorias(),
     obtenerTopRating(),
-    obtenerEnLinea(),
     obtenerEstadisticas(),
     obtenerAviso(),
   ]);
@@ -26,17 +25,16 @@ export default async function Indice() {
   return (
     <Pagina
       activo="Índice"
-      migas={[{ texto: "Índice", href: "/" }, { texto: "Todos los ramos" }]}
+      migas={[{ texto: "Índice", href: "/" }, { texto: "Tu panel" }]}
       lateral={
         <>
-          <CajaSesion />
-          <TopRating top={top} />
-          <Conectados usuarios={enLinea} total={stats.conectados} />
           <Estadisticas datos={stats} />
           <PanelAviso aviso={aviso} />
         </>
       }
     >
+      <PanelUsuario perfil={perfil} />
+      <RankingGlobal top={top} total={stats.miembros} />
       {categorias.map((c) => (
         <SeccionRamos key={c.id} categoria={c} />
       ))}

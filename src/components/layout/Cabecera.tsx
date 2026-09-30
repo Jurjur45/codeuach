@@ -4,7 +4,7 @@ import Link from "next/link";
 const NAV = [
   { texto: "Índice", href: "/" },
   { texto: "Problemas", href: "/hilo" },
-  { texto: "Envíos", href: "/hilo" },
+  { texto: "Envíos", href: "/envios" },
   { texto: "Ranking", href: "/hilo" },
   { texto: "Editoriales", href: "/hilo" },
   { texto: "Miembros", href: "/hilo" },
@@ -21,7 +21,7 @@ export default function Cabecera({ activo }: { activo: SeccionActiva }) {
           <span className="push" />
           <a href="#">Ayuda</a>
           <a href="#">Reglas</a>
-          <a href="#">Entrar con correo UACh</a>
+          <a href="#">jurjur45 · Salir</a>
         </div>
       </div>
 
